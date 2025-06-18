@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "969805808590",
+    "project_id": "gameshareapp-d2395",
+    "storage_bucket": "gameshareapp-d2395.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969805808590:android:4c80487f5585758087e19f",
+        "android_client_info": {
+          "package_name": "com.gameshareapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "969805808590-9il2ug7g6sf2i5i68phsm74ovf95k3uh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBaNOQRa4XmwXDE7swfLgx37V2hIUiZv0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "969805808590-9il2ug7g6sf2i5i68phsm74ovf95k3uh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
