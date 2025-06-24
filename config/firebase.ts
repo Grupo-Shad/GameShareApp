@@ -32,9 +32,7 @@ if (__DEV__) {
   if (missingVars.length > 0) {
     console.warn("⚠️ Variables de entorno faltantes:");
     missingVars.forEach((varName) => console.warn(`  - ${varName}`));
-    console.warn(
-      "🔥 Usando configuración demo. Por favor configura las variables en .env"
-    );
+    console.warn("🔥 Usando configuración demo. Firebase NO funcionará.");
   } else {
     console.log(
       "✅ Todas las variables de Firebase configuradas correctamente"
@@ -42,12 +40,14 @@ if (__DEV__) {
   }
 }
 
-// Inicializar Firebase de forma más simple
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
+
+// Inicializar Auth básico (AsyncStorage se configura automáticamente en React Native)
 const auth = getAuth(app);
 
 if (__DEV__) {
-  console.log("🔥 Firebase conectado correctamente");
+  console.log("🔥 Firebase iniciado correctamente");
   console.log("🔐 Auth configurado:", !!auth);
 }
 
