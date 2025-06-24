@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Text,
   View,
@@ -6,12 +6,19 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../context/AuthContext";
 
 export default function HomeScreen() {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && !loading) {
+      router.replace("/(tabs)");
+    }
+  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -22,35 +29,11 @@ export default function HomeScreen() {
     );
   }
 
+  // Si hay usuario, no mostrar nada ya que se está redirigiendo
   if (user) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-50 px-6">
-        <View className="w-24 h-24 bg-green-500 rounded-full items-center justify-center mb-8">
-          <Ionicons name="checkmark-circle" size={48} color="#FFFFFF" />
-        </View>
-
-        <Text className="text-4xl font-bold text-gray-900 mb-4 text-center">
-          ¡Hola, {user.displayName || "Usuario"}!
-        </Text>
-        <Text className="text-lg text-gray-600 text-center mb-12 leading-6">
-          Has iniciado sesión correctamente. Explora la aplicación usando las
-          tabs.
-        </Text>
-
-        <Link href="/(tabs)" asChild>
-          <TouchableOpacity className="bg-blue-500 rounded-xl py-4 px-8 flex-row items-center justify-center">
-            <Ionicons name="grid-outline" size={20} color="#FFFFFF" />
-            <Text className="text-white text-lg font-semibold ml-2">
-              Explorar Aplicación
-            </Text>
-          </TouchableOpacity>
-        </Link>
-
-        <View className="mt-12 items-center">
-          <Text className="text-sm text-gray-500 mb-2">
-            Usuario: {user.email}
-          </Text>
-        </View>
+      <View className="flex-1 items-center justify-center bg-gray-50">
+        <ActivityIndicator size="large" color="#3B82F6" />
       </View>
     );
   }
