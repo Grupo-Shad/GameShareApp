@@ -6,6 +6,7 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { ActivityIndicator, View, Text } from "react-native";
 import { auth } from "../config/firebase";
@@ -17,6 +18,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -75,6 +77,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error: any) {
+      throw new Error(getErrorMessage(error.code));
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -82,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     register,
     logout,
+    resetPassword,
   };
   if (loading) {
     return (
@@ -131,6 +142,10 @@ function getErrorMessage(errorCode: string): string {
       return "Credenciales inválidas";
     case "auth/network-request-failed":
       return "Error de conexión. Verifica tu internet";
+    case "auth/quota-exceeded":
+      return "Límite de envío de emails excedido. Intenta más tarde";
+    case "auth/missing-email":
+      return "Email es requerido";
     default:
       return "Error de autenticación. Intenta nuevamente";
   }

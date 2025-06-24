@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 import { useAuth } from "../context/AuthContext";
+import { validateRegisterForm, RegisterFormData } from "../utils/validation";
 
 export default function RegisterScreen() {
   const [formData, setFormData] = useState({
@@ -35,30 +36,18 @@ export default function RegisterScreen() {
   };
 
   const validateForm = () => {
-    if (!formData.name.trim()) {
-      Alert.alert("Error", "El nombre es requerido");
+    const formDataToValidate: RegisterFormData = {
+      ...formData,
+      acceptTerms,
+    };
+
+    const validation = validateRegisterForm(formDataToValidate);
+
+    if (!validation.isValid) {
+      Alert.alert("Error", validation.message);
       return false;
     }
-    if (!formData.email.trim()) {
-      Alert.alert("Error", "El email es requerido");
-      return false;
-    }
-    if (!formData.email.includes("@")) {
-      Alert.alert("Error", "El email no tiene un formato válido");
-      return false;
-    }
-    if (formData.password.length < 6) {
-      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      Alert.alert("Error", "Las contraseñas no coinciden");
-      return false;
-    }
-    if (!acceptTerms) {
-      Alert.alert("Error", "Debes aceptar los términos y condiciones");
-      return false;
-    }
+
     return true;
   };
 
@@ -259,15 +248,15 @@ export default function RegisterScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* Divider */}
+          {/* TODO: Implementar autenticación con Google
           <View className="flex-row items-center mb-6">
             <View className="flex-1 h-px bg-gray-300" />
             <Text className="mx-4 text-sm text-gray-500">O regístrate con</Text>
             <View className="flex-1 h-px bg-gray-300" />
           </View>
 
-          {/* Botones de Registro Social */}
-          <View className="flex-row space-x-4 mb-8">
+          
+          <View className="flex space-x-4 mb-8">
             <TouchableOpacity
               className="flex-1 flex-row items-center justify-center bg-white rounded-xl py-3 border border-gray-200"
               disabled={isLoading}
@@ -275,15 +264,8 @@ export default function RegisterScreen() {
               <Ionicons name="logo-google" size={20} color="#EA4335" />
               <Text className="ml-2 text-gray-700 font-medium">Google</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              className="flex-1 flex-row items-center justify-center bg-white rounded-xl py-3 border border-gray-200"
-              disabled={isLoading}
-            >
-              <Ionicons name="logo-apple" size={20} color="#000000" />
-              <Text className="ml-2 text-gray-700 font-medium">Apple</Text>
-            </TouchableOpacity>
           </View>
+          */}
 
           {/* Link a Login */}
           <View className="flex-row justify-center items-center pb-8">
