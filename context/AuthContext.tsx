@@ -71,8 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      console.log("🔥 Iniciando logout...");
       await signOut(auth);
+      console.log("✅ Logout exitoso - Estado de auth limpiado");
     } catch (error: any) {
+      console.error("❌ Error en logout:", error);
       throw new Error(getErrorMessage(error.code));
     }
   };

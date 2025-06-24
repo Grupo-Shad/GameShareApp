@@ -15,7 +15,6 @@ export default function ProfileScreen() {
         onPress: async () => {
           try {
             await logout();
-            router.replace("/");
           } catch (error) {
             Alert.alert("Error", "No se pudo cerrar sesión");
           }
