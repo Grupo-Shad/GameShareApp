@@ -37,11 +37,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="notifications"
+        name="your-games"
         options={{
-          title: "Notificaciones",
+          title: "Your games",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="notifications" size={size} color={color} />
+            <Ionicons name="game-controller" size={size} color={color} />
           ),
         }}
       />
