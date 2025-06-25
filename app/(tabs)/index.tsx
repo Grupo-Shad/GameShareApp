@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import FeaturedGameCard from "@/components/FeaturedGameCard";
+import SafeView from "@/components/SafeView";
 import { getFeaturedGames, FeaturedGame } from "@/utils/api";
 import { router } from "expo-router";
 
@@ -37,7 +38,7 @@ export default function HomeScreen() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-5 pt-16">
+      <SafeView>
         <Text className="text-3xl font-bold text-gray-900 mb-2">
           ¡Bienvenido a GameShare!
         </Text>
@@ -61,7 +62,7 @@ export default function HomeScreen() {
             />
           ))}
         </View>
-      </View>
+      </SafeView>
     </ScrollView>
   );
 }

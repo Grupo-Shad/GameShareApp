@@ -1,10 +1,11 @@
 import { View, Text, ScrollView, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import SafeView from "@/components/SafeView";
 
 export default function ExploreScreen() {
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-5">
+      <SafeView>
         <Text className="text-3xl font-bold text-gray-900 mb-2">Explorar</Text>
         <Text className="text-lg text-gray-500 mb-8">
           Descubre contenido nuevo
@@ -73,7 +74,7 @@ export default function ExploreScreen() {
             </Text>
           </View>
         </View>
-      </View>
+      </SafeView>
     </ScrollView>
   );
 }

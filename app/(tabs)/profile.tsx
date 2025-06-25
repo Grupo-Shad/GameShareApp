@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
 import { router } from "expo-router";
+import SafeView from "@/components/SafeView";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -58,7 +59,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-5">
+      <SafeView>
         {/* Header del perfil */}
         <View className="items-center bg-white rounded-2xl p-8 mb-5 shadow-sm">
           <View className="relative mb-4">
@@ -88,7 +89,7 @@ export default function ProfileScreen() {
         <Text className="text-center text-sm text-gray-500 mt-5">
           Versión 1.0.0
         </Text>
-      </View>
+      </SafeView>
     </ScrollView>
   );
 }

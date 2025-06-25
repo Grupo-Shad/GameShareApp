@@ -1,13 +1,13 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import SafeView from "@/components/SafeView";
 
 export default function YourGamesScreen() {
   const options = [
     {
       id: 1,
       title: "Juegos Favoritos",
-      message:
-        "Tus juegos favoritos!",
+      message: "Tus juegos favoritos!",
       icon: "star",
       color: "#10B981",
     },
@@ -17,16 +17,14 @@ export default function YourGamesScreen() {
       message: "Listas para compartir con tu amigos !",
       icon: "heart",
       color: "#3B82F6",
-    }
+    },
   ];
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-5">
+      <SafeView>
         <View className="flex-row justify-between items-center mb-8">
-          <Text className="text-3xl font-bold text-gray-900">
-            Your Games
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Your Games</Text>
         </View>
 
         <View className="gap-3">
@@ -60,7 +58,7 @@ export default function YourGamesScreen() {
             </TouchableOpacity>
           ))}
         </View>
-      </View>
+      </SafeView>
     </ScrollView>
   );
 }
