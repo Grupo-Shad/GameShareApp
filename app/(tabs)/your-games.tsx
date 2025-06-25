@@ -1,41 +1,40 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 export default function YourGamesScreen() {
+  const router = useRouter(); 
+
   const options = [
     {
       id: 1,
       title: "Juegos Favoritos",
-      message:
-        "Tus juegos favoritos!",
+      message: "Tus juegos favoritos!",
       icon: "star",
       color: "#10B981",
+      path: "/favorites", 
     },
     {
       id: 2,
       title: "Wish-Lists",
-      message: "Listas para compartir con tu amigos !",
+      message: "Listas para compartir con tus amigos!",
       icon: "heart",
       color: "#3B82F6",
-    }
+      path: "/wishlists",
+    },
   ];
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
       <View className="p-5">
-        <View className="flex-row justify-between items-center mb-8">
-          <Text className="text-3xl font-bold text-gray-900">
-            Your Games
-          </Text>
-        </View>
+        <Text className="text-3xl font-bold text-gray-900 mb-8">Your Games</Text>
 
         <View className="gap-3">
           {options.map((option) => (
             <TouchableOpacity
               key={option.id}
-              className={`bg-white rounded-xl p-4 flex-row items-start shadow-sm relative
-                  ? "bg-blue-50 border-l-4 border-blue-500"
-              `}
+              onPress={() => router.push(option.path)}
+              className="bg-white rounded-xl p-4 flex-row items-start shadow-sm"
             >
               <View className="mr-4 p-2 bg-gray-50 rounded-lg">
                 <Ionicons
@@ -45,14 +44,9 @@ export default function YourGamesScreen() {
                 />
               </View>
               <View className="flex-1">
-                <View className="flex-row justify-between items-start mb-1">
-                  <Text
-                    className={`text-base text-gray-900 flex-1 mr-2 
-                       "font-semibold"`}
-                  >
-                    {option.title}
-                  </Text>
-                </View>
+                <Text className="text-base text-gray-900 font-semibold mb-1">
+                  {option.title}
+                </Text>
                 <Text className="text-sm text-gray-600 leading-5">
                   {option.message}
                 </Text>
