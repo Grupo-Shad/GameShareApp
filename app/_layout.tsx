@@ -10,9 +10,9 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerStyle: {
-            backgroundColor: "#3b82f6", // bg-blue-500
+            backgroundColor: "#3b82f6",
           },
-          headerTintColor: "#ffffff", // text-white
+          headerTintColor: "#ffffff",
           headerTitleStyle: {
             fontWeight: "bold",
           },
@@ -35,12 +35,18 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="forgot-password"
+          options={{
+            title: "Recuperar Contraseña",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="(tabs)"
           options={{
             headerShown: false,
           }}
         />
-        {/* ✅ MEJORA: Agregamos opciones para not-found */}
         <Stack.Screen
           name="not-found"
           options={{

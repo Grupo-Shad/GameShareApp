@@ -1,7 +1,37 @@
-import { Tabs } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+import { View, ActivityIndicator, Text } from "react-native";
 
 export default function TabLayout() {
+  const { user, loading } = useAuth();
+  const [hasRedirected, setHasRedirected] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user && !hasRedirected) {
+      setHasRedirected(true);
+      router.replace("/login");
+    }
+  }, [user, loading, hasRedirected]);
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50">
+        <ActivityIndicator size="large" color="#3b82f6" />
+        <Text className="text-gray-600 mt-4">Verificando autenticación...</Text>
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50">
+        <Text className="text-gray-600">Redirigiendo...</Text>
+      </View>
+    );
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -25,6 +55,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -34,6 +65,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -43,6 +75,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="game-controller" size={size} color={color} />
           ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -52,6 +85,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
+          headerShown: false,
         }}
       />
     </Tabs>

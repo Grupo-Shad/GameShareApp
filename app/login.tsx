@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 import { useAuth } from "../context/AuthContext";
+import { validateLoginForm, LoginFormData } from "../utils/validation";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -22,8 +23,11 @@ export default function LoginScreen() {
   const { login } = useAuth();
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Por favor completa todos los campos");
+    const formData: LoginFormData = { email, password };
+    const validation = validateLoginForm(formData);
+
+    if (!validation.isValid) {
+      Alert.alert("Error", validation.message);
       return;
     }
 
@@ -54,10 +58,11 @@ export default function LoginScreen() {
               <Ionicons name="lock-closed" size={40} color="#FFFFFF" />
             </View>
             <Text className="text-3xl font-bold text-gray-900 mb-2">
-              Bienvenido
+              Bienvenido a GameShare!
             </Text>
             <Text className="text-lg text-gray-600 text-center">
-              Inicia sesión en tu cuenta
+              Inicia sesión en tu cuenta para empezar a compartir tus juegos con
+              amigos!
             </Text>
           </View>
 
@@ -120,11 +125,13 @@ export default function LoginScreen() {
             </View>
 
             {/* Olvidé mi contraseña */}
-            <TouchableOpacity className="self-end" disabled={isLoading}>
-              <Text className="text-sm text-blue-500 font-medium">
-                ¿Olvidaste tu contraseña?
-              </Text>
-            </TouchableOpacity>
+            <Link href="/forgot-password" asChild>
+              <TouchableOpacity className="self-end" disabled={isLoading}>
+                <Text className="text-sm text-blue-500 font-medium">
+                  ¿Olvidaste tu contraseña?
+                </Text>
+              </TouchableOpacity>
+            </Link>
           </View>
 
           {/* Botón de Login */}
@@ -140,14 +147,14 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* Divider */}
+          {/* TODO: Implementar autenticación con Google
           <View className="flex-row items-center mb-6">
             <View className="flex-1 h-px bg-gray-300" />
             <Text className="mx-4 text-sm text-gray-500">O continúa con</Text>
             <View className="flex-1 h-px bg-gray-300" />
           </View>
 
-          {/* Botones de Login Social */}
+          {/* TODO: Implementar autenticación con Google
           <View className="flex-row space-x-4 mb-8">
             <TouchableOpacity
               className="flex-1 flex-row items-center justify-center bg-white rounded-xl py-3 border border-gray-200"
@@ -156,15 +163,8 @@ export default function LoginScreen() {
               <Ionicons name="logo-google" size={20} color="#EA4335" />
               <Text className="ml-2 text-gray-700 font-medium">Google</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              className="flex-1 flex-row items-center justify-center bg-white rounded-xl py-3 border border-gray-200"
-              disabled={isLoading}
-            >
-              <Ionicons name="logo-apple" size={20} color="#000000" />
-              <Text className="ml-2 text-gray-700 font-medium">Apple</Text>
-            </TouchableOpacity>
           </View>
+          */}
 
           {/* Link a Registro */}
           <View className="flex-row justify-center items-center pb-8">
