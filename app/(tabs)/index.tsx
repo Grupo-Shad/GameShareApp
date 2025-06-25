@@ -2,6 +2,7 @@ import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import FeaturedGameCard from "@/components/FeaturedGameCard";
 import { getFeaturedGames, FeaturedGame } from "@/utils/api";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const [games, setGames] = useState<FeaturedGame[]>([]);
@@ -55,8 +56,7 @@ export default function HomeScreen() {
               description={game.description}
               category={game.category}
               onPress={() => {
-                // TODO: Navegar a la pantalla de detalles del juego
-                console.log(`Pressed game: ${game.title}`);
+                router.push(`/game/${game.id}`);
               }}
             />
           ))}
