@@ -19,6 +19,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  getIdToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      getIdToken()
     } catch (error: any) {
       throw new Error(getErrorMessage(error.code));
     }
@@ -88,6 +90,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+const getIdToken = async () => {
+  if (auth.currentUser) {
+    console.log(auth.currentUser)
+    return await auth.currentUser.getIdToken();
+  }
+  return null;
+};
+
   const value = {
     user,
     loading,
@@ -96,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     resetPassword,
+    getIdToken
   };
   if (loading) {
     return (
