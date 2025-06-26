@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import SafeView from "@/components/SafeView";
 
 export default function YourGamesScreen() {
   const router = useRouter(); 
@@ -26,8 +27,10 @@ export default function YourGamesScreen() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-5">
-        <Text className="text-3xl font-bold text-gray-900 mb-8">Your Games</Text>
+      <SafeView>
+        <View className="flex-row justify-between items-center mb-8">
+          <Text className="text-3xl font-bold text-gray-900">Your Games</Text>
+        </View>
 
         <View className="gap-3">
           {options.map((option) => (
@@ -54,7 +57,7 @@ export default function YourGamesScreen() {
             </TouchableOpacity>
           ))}
         </View>
-      </View>
+      </SafeView>
     </ScrollView>
   );
 }

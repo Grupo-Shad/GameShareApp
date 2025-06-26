@@ -2,7 +2,7 @@ import { Tabs, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
-import { View, ActivityIndicator, Text } from "react-native";
+import { View, ActivityIndicator, Text, ScrollView } from "react-native";
 
 export default function TabLayout() {
   const { user, loading } = useAuth();

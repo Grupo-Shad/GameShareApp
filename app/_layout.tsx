@@ -11,12 +11,10 @@ export default function RootLayout() {
       <AuthProvider>
         <Stack
           screenOptions={{
-            headerStyle: {
-              backgroundColor: "#3b82f6",
-            },
-            headerTintColor: "#ffffff",
+            headerTintColor: "black",
             headerTitleStyle: {
               fontWeight: "bold",
+              fontSize: 16,
             },
             headerShadowVisible: false,
           }}

@@ -40,7 +40,7 @@ export default function HomeScreen() {
 
   // Si no está autenticado, mostrar pantalla de bienvenida
   return (
-    <View className="flex-1 items-center justify-center bg-gray-50 px-6">
+    <View className="flex-1 items-center justify-center bg-gray-50 px-4">
       <View className="w-48 h-48 rounded-full items-center justify-center mb-8">
         <Image
           source={require("../assets/logo.png")}
