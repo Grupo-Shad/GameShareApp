@@ -3,17 +3,19 @@ import { useEffect, useState } from "react";
 import FeaturedGameCard from "@/components/FeaturedGameCard";
 import SafeView from "@/components/SafeView";
 import { getFeaturedGames, FeaturedGame } from "@/utils/api";
+import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
 
 export default function HomeScreen() {
   const [games, setGames] = useState<FeaturedGame[]>([]);
   const [loading, setLoading] = useState(true);
+  const { getIdToken } = useAuth();
 
   useEffect(() => {
     const loadFeaturedGames = async () => {
       try {
         setLoading(true);
-        const featuredGames = await getFeaturedGames();
+        const featuredGames = await getFeaturedGames(getIdToken);
         setGames(featuredGames);
       } catch (error) {
         console.error("Error loading featured games:", error);
@@ -50,7 +52,7 @@ export default function HomeScreen() {
         <View className="space-y-4">
           {games.map((game) => (
             <FeaturedGameCard
-              key={game.id}
+              key={game._id}
               name={game.name}
               imageUrl={game.imageUrl}
               score={game.score}
@@ -60,7 +62,7 @@ export default function HomeScreen() {
               publisher={game.publisher}
               releaseDate={game.releaseDate}
               onPress={() => {
-                router.push(`/game/${game.id}`);
+                router.push(`/game/${game._id}`);
               }}
             />
           ))}

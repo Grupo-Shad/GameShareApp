@@ -8,30 +8,21 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { getGameData } from "../../utils/api";
-
-interface GameData {
-  id: string;
-  title: string;
-  coverImage: string;
-  year: number;
-  developer: string;
-  platforms: string[];
-  synopsis: string;
-}
+import { getGameData, FeaturedGame } from "../../utils/api";
+import { useAuth } from "../../context/AuthContext";
 
 export default function GameDetail() {
   const { id } = useLocalSearchParams();
-  const [gameData, setGameData] = useState<GameData | null>(null);
+  const [gameData, setGameData] = useState<FeaturedGame | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { getIdToken } = useAuth();
   useEffect(() => {
     const loadGameData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await getGameData(id as string);
+        const data = await getGameData(id as string, getIdToken);
         setGameData(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -83,14 +74,14 @@ export default function GameDetail() {
     <SafeAreaView className="flex-1 bg-gray-50">
       <Stack.Screen
         options={{
-          title: gameData.title,
+          title: gameData.name,
         }}
       />
 
       <ScrollView className="flex-1">
         <View className="w-full h-80 bg-gray-200">
           <Image
-            source={{ uri: gameData.coverImage }}
+            source={{ uri: gameData.imageUrl }}
             className="w-full h-full"
             resizeMode="cover"
           />
@@ -98,18 +89,22 @@ export default function GameDetail() {
 
         <View className="px-4 py-6">
           <Text className="text-3xl font-bold text-gray-900 mb-2">
-            {gameData.title}
+            {gameData.name}
           </Text>
           <View className="flex-row items-center mb-4">
-            <Text className="text-lg text-gray-600 mr-4">{gameData.year}</Text>
-            <Text className="text-lg text-gray-600">{gameData.developer}</Text>
+            <Text className="text-lg text-gray-600 mr-4">
+              {gameData.releaseDate}
+            </Text>
+            <Text className="text-lg text-gray-600">
+              {gameData.developerStudio}
+            </Text>
           </View>
           <View className="mb-6">
             <Text className="text-sm font-semibold text-gray-700 mb-2">
               Plataformas:
             </Text>
             <View className="flex-row flex-wrap">
-              {gameData.platforms.map((platform, index) => (
+              {gameData.availablePlatforms?.map((platform, index) => (
                 <View
                   key={index}
                   className="bg-blue-100 px-3 py-1 rounded-full mr-2 mb-2"
@@ -126,7 +121,7 @@ export default function GameDetail() {
               Argumento
             </Text>
             <Text className="text-base text-gray-700 leading-6">
-              {gameData.synopsis}
+              {gameData.description}
             </Text>
           </View>
         </View>
