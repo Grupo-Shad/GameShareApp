@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import SafeView from "@/components/SafeView";
 
 export default function YourGamesScreen() {
-  const router = useRouter(); 
+  const router = useRouter();
 
   const options = [
     {
@@ -13,7 +13,7 @@ export default function YourGamesScreen() {
       message: "Tus juegos favoritos!",
       icon: "star",
       color: "#10B981",
-      path: "/favorites", 
+      path: "/favorites",
     },
     {
       id: 2,
