@@ -1,4 +1,10 @@
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { useEffect, useState } from "react";
 import FeaturedGameCard from "@/components/FeaturedGameCard";
 import SafeView from "@/components/SafeView";
@@ -9,21 +15,23 @@ import { router } from "expo-router";
 export default function HomeScreen() {
   const [games, setGames] = useState<FeaturedGame[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { getIdToken } = useAuth();
 
-  useEffect(() => {
-    const loadFeaturedGames = async () => {
-      try {
-        setLoading(true);
-        const featuredGames = await getFeaturedGames(getIdToken);
-        setGames(featuredGames);
-      } catch (error) {
-        console.error("Error loading featured games:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadFeaturedGames = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const featuredGames = await getFeaturedGames(getIdToken);
+      setGames(featuredGames);
+    } catch (error) {
+      setError("Error al cargar los juegos. Por favor, inténtalo de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadFeaturedGames();
   }, []);
 
@@ -34,6 +42,30 @@ export default function HomeScreen() {
         <Text className="mt-4 text-gray-600">
           Cargando juegos destacados...
         </Text>
+      </View>
+    );
+  }
+
+  // Mostrar error o estado vacío con botón de reintentar
+  if (error || games.length === 0) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50 px-6">
+        <Text className="text-xl font-semibold text-gray-900 mb-2 text-center">
+          {error || "No hay juegos disponibles"}
+        </Text>
+        <Text className="text-gray-600 mb-6 text-center">
+          {error
+            ? "Verifica tu conexión a internet e inténtalo nuevamente"
+            : "No se encontraron juegos destacados en este momento"}
+        </Text>
+        <TouchableOpacity
+          onPress={loadFeaturedGames}
+          className="bg-blue-500 px-6 py-3 rounded-lg active:bg-blue-600"
+        >
+          <Text className="text-white font-semibold text-center">
+            Reintentar
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
