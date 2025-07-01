@@ -1,80 +1,237 @@
-import { View, Text, ScrollView, TextInput } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import SafeView from "@/components/SafeView";
+import GameCard from "@/components/GameCard";
+import { useAuth } from "@/context/AuthContext";
+import {
+  getGames,
+  searchGames,
+  FeaturedGame,
+} from "@/utils/api";
 
-export default function ExploreScreen() {
+export default function Explore() {
+
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
+  const { getIdToken } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [games, setGames] = useState<FeaturedGame[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [debouncing, setDebouncing] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [adding, setAdding] = useState<string | null>(null);
+  const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    loadDefaultGames();
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim().length >= 2) {
+      setDebouncing(true);
+      const debounceTimer = setTimeout(() => {
+        setDebouncing(false);
+        searchForGames();
+      }, 1000);
+
+      return () => {
+        clearTimeout(debounceTimer);
+        setDebouncing(false);
+      };
+    } else {
+      if (searchQuery.trim().length === 0) {
+        loadDefaultGamesQuiet();
+      } else {
+        setGames([]);
+      }
+      setDebouncing(false);
+    }
+  }, [searchQuery]);
+
+  const loadDefaultGames = async () => {
+    setLoading(true);
+    try {
+      const data = await getGames(getIdToken);
+      setGames(data);
+    } catch (err) {
+      Alert.alert("Error", "No se pudieron cargar los juegos");
+      setGames([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadDefaultGamesQuiet = async () => {
+    try {
+      const data = await getGames(getIdToken);
+      setGames(data);
+    } catch (err) {
+      setGames([]);
+    }
+  };
+
+  const searchForGames = useCallback(async () => {
+    setSearching(true);
+    try {
+      const data = await searchGames(searchQuery.trim(), getIdToken);
+      setGames(data);
+    } catch (err) {
+      setGames([]);
+    } finally {
+      setSearching(false);
+    }
+  }, [searchQuery, getIdToken]);
+
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen
+          options={{
+            title: "Explora nuestros juegos.",
+            headerShown: true,
+            headerBackTitle: "Atrás",
+            headerTintColor: "black",
+            headerTitleStyle: {
+              fontWeight: "bold",
+              fontSize: 16,
+            },
+            headerShadowVisible: false,
+          }}
+        />
+        <View className="flex-1 bg-gray-900 justify-center items-center">
+          <ActivityIndicator size="large" color="#3B82F6" />
+          <Text className="text-gray-400 mt-4">Cargando juegos...</Text>
+        </View>
+      </>
+    );
+  }
+
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <SafeView>
-        <Text className="text-3xl font-bold text-gray-900 mb-2">Explorar</Text>
-        <Text className="text-lg text-gray-500 mb-8">
-          Descubre contenido nuevo
-        </Text>
-
-        <View className="flex-row items-center bg-white rounded-xl px-4 py-3 mb-8 shadow-sm">
-          <Ionicons name="search" size={20} color="#6B7280" className="mr-3" />
-          <TextInput
-            className="flex-1 text-base text-gray-900"
-            placeholder="Buscar..."
-            placeholderTextColor="#6B7280"
-          />
-        </View>
-
-        <View className="mb-8">
-          <Text className="text-xl font-semibold text-gray-900 mb-4">
-            Categorías populares
-          </Text>
-          <View className="flex-row flex-wrap justify-between">
-            <View className="bg-white rounded-xl p-5 items-center w-[48%] mb-3 shadow-sm">
-              <Ionicons name="trending-up" size={24} color="#3B82F6" />
-              <Text className="mt-2 text-sm font-medium text-gray-900">
-                Tendencias
-              </Text>
-            </View>
-            <View className="bg-white rounded-xl p-5 items-center w-[48%] mb-3 shadow-sm">
-              <Ionicons name="star" size={24} color="#F59E0B" />
-              <Text className="mt-2 text-sm font-medium text-gray-900">
-                Destacados
-              </Text>
-            </View>
-            <View className="bg-white rounded-xl p-5 items-center w-[48%] mb-3 shadow-sm">
-              <Ionicons name="time" size={24} color="#10B981" />
-              <Text className="mt-2 text-sm font-medium text-gray-900">
-                Recientes
-              </Text>
-            </View>
-            <View className="bg-white rounded-xl p-5 items-center w-[48%] mb-3 shadow-sm">
-              <Ionicons name="heart" size={24} color="#EF4444" />
-              <Text className="mt-2 text-sm font-medium text-gray-900">
-                Favoritos
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <View className="mb-8">
-          <Text className="text-xl font-semibold text-gray-900 mb-4">
-            Sugerencias para ti
-          </Text>
-          <View className="bg-white rounded-xl p-5 mb-4 shadow-sm">
-            <Text className="text-lg font-semibold text-gray-900 mb-2">
-              Contenido personalizado
+    <>
+      <Stack.Screen
+        options={{
+          title: "Explorar",
+          headerShown: true,
+          headerBackTitle: "Atrás",
+          headerTintColor: "black",
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 16,
+          },
+          headerShadowVisible: false,
+        }}
+      />
+      <View className="flex-1 bg-gray-50">
+        <SafeView className="flex-1">
+          {/* Buscador de juegos */}
+          <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+            <Text className="text-lg font-semibold text-gray-900 mb-3">
+              Buscar juegos
             </Text>
-            <Text className="text-base text-gray-600 leading-6">
-              Basado en tus intereses y actividad reciente, te sugerimos
-              explorar estas opciones.
+            <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3">
+              <Ionicons name="search" size={20} color="#6B7280" />
+              <TextInput
+                className="flex-1 ml-3 text-gray-900"
+                placeholder="Buscar por nombre o género..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholderTextColor="#9CA3AF"
+                autoCapitalize="none"
+              />
+            </View>
+            <Text className="text-sm text-gray-500 mt-2">
+              Escribe al menos 2 caracteres para buscar
             </Text>
           </View>
-          <View className="bg-white rounded-xl p-5 mb-4 shadow-sm">
-            <Text className="text-lg font-semibold text-gray-900 mb-2">
-              Nuevos en la plataforma
-            </Text>
-            <Text className="text-base text-gray-600 leading-6">
-              Descubre los últimos contenidos agregados a la aplicación.
-            </Text>
-          </View>
-        </View>
-      </SafeView>
-    </ScrollView>
+
+          {/* Indicador de espera */}
+          {debouncing && (
+            <View className="bg-yellow-50 rounded-xl p-4 mb-4 shadow-sm border border-yellow-200">
+              <View className="flex-row items-center justify-center">
+                <ActivityIndicator size="small" color="#F59E0B" />
+                <Text className="text-yellow-700 ml-2">Esperando...</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Indicador de búsqueda */}
+          {searching && (
+            <View className="bg-blue-50 rounded-xl p-4 mb-4 shadow-sm border border-blue-200">
+              <View className="flex-row items-center justify-center">
+                <ActivityIndicator size="small" color="#3B82F6" />
+                <Text className="text-blue-700 ml-2">Buscando juegos...</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Lista de juegos */}
+          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+            {/* Mensaje sin resultados */}
+            {games.length === 0 &&
+              searchQuery.trim().length >= 2 &&
+              !searching &&
+              !debouncing && (
+                <View className="bg-white rounded-xl p-8 mb-4 shadow-sm">
+                  <Text className="text-gray-500 text-center">
+                    No se encontraron juegos
+                  </Text>
+                  <Text className="text-gray-400 text-center mt-2">
+                    Intenta con otro término de búsqueda
+                  </Text>
+                </View>
+              )}
+
+            {/* Grilla de juegos */}
+            {games.length > 0 && (
+              <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+                <View className="flex-row flex-wrap">
+                  {games.map((game, index) => {
+                    const gameId = game._id || (game as any).id;
+                    const gameName =
+                      game.name || (game as any).title || "Sin título";
+
+                    return (
+                      <View
+                        key={gameId || `game-${index}`}
+                        className="w-1/2 p-2"
+                      >
+                        <View className="relative">
+                          <GameCard
+                            gameId={game._id}
+                            imageUrl={game.imageUrl || ""}
+                            title={gameName}
+                            subtitle={
+                              (game.genre || []).join(", ") || "Sin género"
+                            }
+                            isFavorite={game.isFavorite}
+                            onPress={() => router.push(`/game/${game._id}`)} 
+                          />
+
+                          {/* Overlay de carga */}
+                          {adding === gameId && (
+                            <View className="absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                              <ActivityIndicator size="large" color="white" />
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+          </ScrollView>
+        </SafeView>
+      </View>
+    </>
   );
 }
