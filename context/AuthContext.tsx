@@ -9,6 +9,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { ActivityIndicator, View, Text } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from "../config/firebase";
 
 interface AuthContextType {
@@ -50,7 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      getIdToken()
+      // Obtener y guardar token después del login
+      const token = await getIdToken();
+      if (token) {
+        await AsyncStorage.setItem("userToken", token);
+      }
     } catch (error: any) {
       throw new Error(getErrorMessage(error.code));
     }
@@ -75,6 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("🔥 Iniciando logout...");
       await signOut(auth);
+      // Limpiar token del storage
+      await AsyncStorage.removeItem("userToken");
       console.log("✅ Logout exitoso - Estado de auth limpiado");
     } catch (error: any) {
       console.error("❌ Error en logout:", error);
@@ -90,13 +97,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-const getIdToken = async () => {
-  if (auth.currentUser) {
-    console.log(auth.currentUser)
-    return await auth.currentUser.getIdToken();
-  }
-  return null;
-};
+  const getIdToken = async () => {
+    try {
+      // Intentar obtener token del storage primero
+      const storedToken = await AsyncStorage.getItem("userToken");
+      if (storedToken) {
+        return storedToken;
+      }
+
+      // Si no hay token en storage, obtener nuevo de Firebase
+      if (auth.currentUser) {
+        console.log(auth.currentUser);
+        const newToken = await auth.currentUser.getIdToken();
+        if (newToken) {
+          await AsyncStorage.setItem("userToken", newToken);
+        }
+        return newToken;
+      }
+    } catch (error) {
+      console.error("Error obteniendo token:", error);
+    }
+    return null;
+  };
 
   const value = {
     user,
@@ -106,7 +128,7 @@ const getIdToken = async () => {
     register,
     logout,
     resetPassword,
-    getIdToken
+    getIdToken,
   };
   if (loading) {
     return (

@@ -16,7 +16,6 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || "1:123456789:web:demo",
 };
 
-// Verificar que todas las variables de entorno estén configuradas
 if (__DEV__) {
   const requiredVars = [
     "EXPO_PUBLIC_FIREBASE_API_KEY",
@@ -40,10 +39,8 @@ if (__DEV__) {
   }
 }
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 
-// Inicializar Auth básico (AsyncStorage se configura automáticamente en React Native)
 const auth = getAuth(app);
 
 if (__DEV__) {

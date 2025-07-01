@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getIdToken } from "firebase/auth";
 
 export interface FeaturedGame {
   _id: string;
@@ -16,7 +15,8 @@ export interface FeaturedGame {
   isFavorite?: boolean;
 }
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || "http://192.168.1.8:8080/api";
+const API_URL =
+  process.env.EXPO_PUBLIC_BACKEND_URL || "http://192.168.1.8:8080/api";
 
 export const getFeaturedGames = async (
   getIdToken: () => Promise<string | null>
@@ -83,7 +83,7 @@ export const getGameData = async (
   return response.data;
 };
 
-export const toggleFavorite = async (	
+export const toggleFavorite = async (
   userId: string,
   gameId: string,
   getIdToken: () => Promise<string | null>
@@ -108,7 +108,7 @@ export const getUserFavorites = async (
   getIdToken: () => Promise<string | null>
 ): Promise<FeaturedGame[]> => {
   const token = await getIdToken();
-  
+
   try {
     const response = await axios.get(`${API_URL}/favorites/${userId}`, {
       headers: {
