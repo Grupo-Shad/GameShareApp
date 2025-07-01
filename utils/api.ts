@@ -13,9 +13,10 @@ export interface FeaturedGame {
   releaseDate?: string;
   availablePlatforms?: string[];
   featured?: boolean;
+  isFavorite?: boolean;
 }
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || "http://localhost:8080";
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || "http://192.168.1.8:8080/api";
 
 export const getFeaturedGames = async (
   getIdToken: () => Promise<string | null>
@@ -80,6 +81,51 @@ export const getGameData = async (
   });
 
   return response.data;
+};
+
+export const toggleFavorite = async (	
+  userId: string,
+  gameId: string,
+  getIdToken: () => Promise<string | null>
+): Promise<any> => {
+  const token = await getIdToken();
+  const response = await axios.post(
+    `${API_URL}/favorites/toggle`,
+    { userId, gameId },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const getUserFavorites = async (
+  userId: string,
+  getIdToken: () => Promise<string | null>
+): Promise<FeaturedGame[]> => {
+  const token = await getIdToken();
+  
+  try {
+    const response = await axios.get(`${API_URL}/favorites/${userId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    // Si es un 404, significa que el usuario no tiene favoritos
+    if (error.response?.status === 404) {
+      return [];
+    }
+    // Para otros errores, sí lanzamos la excepción
+    throw error;
+  }
 };
 
 export interface WishlistApiResponse {

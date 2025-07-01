@@ -1,48 +1,69 @@
-import React from "react";
-import { View, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, FlatList, Text, ActivityIndicator } from "react-native";
 import GameCard from "@/components/GameCard";
 import { useRouter, Stack } from "expo-router";
-
-const games = [
-  {
-    id: "1",
-    title: "The Witcher 3",
-    subtitle: "RPG - CD Projekt",
-    imageUrl:
-      "https://image.api.playstation.com/vulcan/img/cfn/11307AkQcrbgZ7mT3j6q2P7D5KL4V8WyYZDQzT1cx9MZ-63GlwZw3IdYr_MksKXH6UMu2SlPYHpsDZ3mlOEQAXUgeOo.png",
-  },
-  {
-    id: "2",
-    title: "God of War",
-    subtitle: "Acción - Santa Monica Studio",
-    imageUrl:
-      "https://gmedia.playstation.com/is/image/SIEPDC/god-of-war-hub-hero-desktop-01-en-08sep21?$1600px$",
-  },
-  {
-    id: "3",
-    title: "God of War",
-    subtitle: "Acción - Santa Monica Studio",
-    imageUrl:
-      "https://gmedia.playstation.com/is/image/SIEPDC/god-of-war-hub-hero-desktop-01-en-08sep21?$1600px$",
-  },
-  {
-    id: "4",
-    title: "God of War",
-    subtitle: "Acción - Santa Monica Studio",
-    imageUrl:
-      "https://gmedia.playstation.com/is/image/SIEPDC/god-of-war-hub-hero-desktop-01-en-08sep21?$1600px$",
-  },
-  {
-    id: "5",
-    title: "God of War",
-    subtitle: "Acción - Santa Monica Studio",
-    imageUrl:
-      "https://gmedia.playstation.com/is/image/SIEPDC/god-of-war-hub-hero-desktop-01-en-08sep21?$1600px$",
-  },
-];
+import { useAuth } from "@/context/AuthContext";
+import { getUserFavorites, FeaturedGame } from "@/utils/api";
 
 export default function FavoritesScreen() {
   const router = useRouter();
+  const { user, getIdToken } = useAuth();
+  const [favoriteGames, setFavoriteGames] = useState<FeaturedGame[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (user?.uid) {
+        try {
+          setLoading(true);
+          setError(null);
+          console.log("user.uid", user.uid);
+          
+          const games = await getUserFavorites(user.uid, getIdToken);
+          console.log("games (final):", games);
+          
+          setFavoriteGames(games);
+        } catch (error) {
+          console.error("Error al obtener favoritos:", error);
+          setError("No se pudieron cargar los favoritos");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchFavorites();
+  }, [user?.uid, getIdToken]);
+
+  const renderEmptyState = () => (
+    <View className="flex-1 justify-center items-center px-8">
+      <Text className="text-gray-400 text-xl font-semibold mb-3">
+        No tienes juegos favoritos
+      </Text>
+      <Text className="text-gray-500 text-center leading-6">
+        Explora juegos y marca los que más te gusten como favoritos para verlos aquí
+      </Text>
+    </View>
+  );
+
+  const renderLoadingState = () => (
+    <View className="flex-1 justify-center items-center">
+      <ActivityIndicator size="large" color="#3b82f6" />
+      <Text className="text-gray-400 mt-4">Cargando favoritos...</Text>
+    </View>
+  );
+
+  const renderErrorState = () => (
+    <View className="flex-1 justify-center items-center px-8">
+      <Text className="text-red-400 text-xl font-semibold mb-3">
+        Error al cargar
+      </Text>
+      <Text className="text-gray-500 text-center leading-6">
+        {error}
+      </Text>
+    </View>
+  );
 
   return (
     <>
@@ -60,20 +81,32 @@ export default function FavoritesScreen() {
         }}
       />
       <View className="flex-1 bg-gray-900 px-4 pt-4">
-        <FlatList
-          data={games}
-          numColumns={2}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <GameCard
-              imageUrl={item.imageUrl}
-              title={item.title}
-              subtitle={item.subtitle}
-              onPress={() => router.push(`/game/${item.id}`)}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-        />
+        {loading ? renderLoadingState() : 
+         error ? renderErrorState() :
+         favoriteGames.length === 0 ? renderEmptyState() : (
+          <FlatList
+            data={favoriteGames}
+            numColumns={2}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <GameCard
+                gameId={item._id}
+                imageUrl={item.imageUrl || ""}
+                title={item.name}
+                subtitle={`${item.genre?.join(", ") || "Juego"} - ${item.developerStudio || "Desarrollador"}`}
+                isFavorite={true}
+                onPress={() => router.push(`/game/${item._id}`)}
+                onFavoriteToggle={(isFavorite) => {
+                  if (!isFavorite) {
+                    // Remover el juego de la lista local cuando se desmarca como favorito
+                    setFavoriteGames(prev => prev.filter(game => game._id !== item._id));
+                  }
+                }}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+         )}
       </View>
     </>
   );

@@ -85,6 +85,7 @@ export default function HomeScreen() {
           {games.map((game) => (
             <FeaturedGameCard
               key={game._id}
+              gameId={game._id}
               name={game.name}
               imageUrl={game.imageUrl}
               score={game.score}
@@ -93,6 +94,7 @@ export default function HomeScreen() {
               developerStudio={game.developerStudio}
               publisher={game.publisher}
               releaseDate={game.releaseDate}
+              isFavorite={game.isFavorite}
               onPress={() => {
                 router.push(`/game/${game._id}`);
               }}

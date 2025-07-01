@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/context/AuthContext";
+import { toggleFavorite } from "@/utils/api";
 
 interface FeaturedGameCardProps {
+  gameId: string;
   name: string;
   imageUrl?: string;
   score: number;
@@ -11,12 +14,13 @@ interface FeaturedGameCardProps {
   developerStudio?: string;
   publisher?: string;
   releaseDate?: string;
-  initialFavorite?: boolean;
+  isFavorite?: boolean;
   onPress?: () => void;
   onFavoriteChange?: (isFavorite: boolean) => void;
 }
 
 const FeaturedGameCard: React.FC<FeaturedGameCardProps> = ({
+  gameId,
   name,
   imageUrl,
   score,
@@ -25,11 +29,17 @@ const FeaturedGameCard: React.FC<FeaturedGameCardProps> = ({
   developerStudio,
   publisher,
   releaseDate,
-  initialFavorite = false,
+  isFavorite = false,
   onPress,
   onFavoriteChange,
 }) => {
-  const [isFavorite, setIsFavorite] = useState(initialFavorite);
+  const { user, getIdToken } = useAuth();
+  const [isCurrentlyFavorite, setIsCurrentlyFavorite] = useState(isFavorite);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    setIsCurrentlyFavorite(isFavorite);
+  }, [isFavorite]);
 
   const getScoreColor = (score: number) => {
     if (score >= 75) return "bg-green-500";
@@ -43,10 +53,21 @@ const FeaturedGameCard: React.FC<FeaturedGameCardProps> = ({
     return "Mixed Reviews";
   };
 
-  const handleFavoritePress = () => {
-    const newFavoriteState = !isFavorite;
-    setIsFavorite(newFavoriteState);
-    onFavoriteChange?.(newFavoriteState);
+  const handleFavoritePress = async () => {
+    if (!user || isProcessing) return;
+    
+    setIsProcessing(true);
+    try {
+      await toggleFavorite(user.uid, gameId, getIdToken);
+      const newFavoriteState = !isCurrentlyFavorite;
+      setIsCurrentlyFavorite(newFavoriteState);
+      onFavoriteChange?.(newFavoriteState);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      Alert.alert('Error', 'No se pudo actualizar el favorito');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const formatReleaseDate = (dateString?: string) => {
@@ -138,12 +159,13 @@ const FeaturedGameCard: React.FC<FeaturedGameCardProps> = ({
         <View className="flex-row justify-end">
           <TouchableOpacity
             onPress={handleFavoritePress}
+            disabled={isProcessing}
             className="p-2 rounded-full"
           >
             <Ionicons
-              name={isFavorite ? "heart" : "heart-outline"}
+              name={isCurrentlyFavorite ? "star" : "star-outline"}
               size={28}
-              color={isFavorite ? "#EF4444" : "#9CA3AF"}
+              color={isCurrentlyFavorite ? "#FFD700" : "#9CA3AF"}
             />
           </TouchableOpacity>
         </View>
